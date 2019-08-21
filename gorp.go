@@ -72,14 +72,12 @@ func open(path string) (*os.File, error) {
 	return f, err
 }
 
-func handleLine(text string, re *regexp.Regexp, lineNumber int, options meta, builder *strings.Builder) {
+func handleLine(text string, re *regexp.Regexp, lineNumber int, options meta) string {
 	text = options.colorFunc(text)
 	if options.folderMode {
-		text = fmt.Sprintf("\n[%s]:%s", color.Green.Render(lineNumber), text)
-		builder.WriteString(text)
-	} else {
-		syncPrint(text)
+		fmt.Sprintf("\n[%s]:%s", color.Green.Render(lineNumber), text)
 	}
+	return text
 }
 
 // Opens the file and loops over it
@@ -105,7 +103,12 @@ func handleFile(path string, re *regexp.Regexp, wg *sync.WaitGroup, options meta
 			text := scanner.Text()
 			if re.MatchString(text) {
 				match = true
-				handleLine(text, re, lineNumber, options, builder)
+				line := handleLine(text, re, lineNumber, options)
+				if options.folderMode {
+					builder.WriteString(line)
+				} else {
+					print(line)
+				}
 			}
 		}
 		if match && options.folderMode {
