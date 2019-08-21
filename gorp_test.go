@@ -6,7 +6,7 @@ import (
 )
 
 func Test_handleLine(t *testing.T) {
-	str := "1234"
+	str := "33333"
 	pattern := "12\\d4"
 
 	opts := meta{
